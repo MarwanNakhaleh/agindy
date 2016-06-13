@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	<script src="htp://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script> 
+	<link rel="stylesheet" href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' />
+	<link rel="stylesheet" href="<%= url('/assets/css/main.css') %>" />
+	<style>
+		#mapid { 
+			height: 600px;
+			width: 50%;
+			display: inline-block;
+			float:right;
+		}
+		.inline{
+			width:50%;
+			float:left;	
+		}
+		.row{
+			display:block;
+			width:100%;
+		}
+	</style>
+
+	<title>Ag Indy - Indy's Premier City Data Aggregator</title>
+</head>
+
+<body>
+	<body>
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="inner">
+
+							<!-- Logo -->
+								<a href="/" class="logo">
+									<span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Ag Indy</span>
+								</a>
+
+							<!-- Nav -->
+								<nav>
+									<ul>
+										<li><a href="#menu">Menu</a></li>
+									</ul>
+								</nav>
+
+						</div>
+					</header>
+
+				<%= erb :menu %>
+
+				<div id="main">
+					<div class="inner">
+						<p><a href="/maps">Back</a></p>
+						<header>
+							<h1>Violent Crimes in Indianapolis by year</h1>
+							<div class="row">
+								<div class="inline">
+									<input id="delAbandoned" type="button" value="- abandoned" />
+									<input id="addAbandoned" type="button" value="+ abandoned" /><br><br>
+									<input id="delBeat" type="button" value="- police beat" />
+									<input id="addBeat" type="button" value="+ police beat" /><br><br>
+									<input id="delNeighborhood" type="button" value="- neighborhood" />
+									<input id="addNeighborhood" type="button" value="+ neighborhood" /><br><br>
+									<input id="del2014" type="button" value="- 2014 data" />
+									<input id="add2014" type="button" value="+ 2014 data" /><br>
+									<input id="del2013" type="button" value="- 2013 data" />
+									<input id="add2013" type="button" value="+ 2013 data" /><br>
+									<input id="del2012" type="button" value="- 2012 data" />
+									<input id="add2012" type="button" value="+ 2012 data" /><br>
+									<input id="del2011" type="button" value="- 2011 data" />
+									<input id="add2011" type="button" value="+ 2011 data" /><br>
+									<input id="del2010" type="button" value="- 2010 data" />
+									<input id="add2010" type="button" value="+ 2010 data" />
+								</div>
+								<div id="mapid"></div>
+							</div>
+							<!--
+							<br><br>
+							<p><b>Green:</b> 2014</p>
+							<p><b>Yellow:</b> 2013</p>
+							<p><b>Orange:</b> 2012</p>
+							<p><b>Red:</b> 2011</p>
+							<p><b>Purple:</b> 2010</p>
+							-->
+							<script src="http://cdn.leafletjs.com/leaflet/v0.6.4/leaflet.js"></script>
+							<script src="<%= url('/ZIP_Code_Boundaries.js') %>"></script>
+							<script src="<%= url('/Indianapolis_Police_Zones.js') %>"></script>
+							<script src="<%= url('/Abandoned_Housing.js') %>"></script>
+							<script src="<%= url('/Indy_Neighborhoods.js') %>"></script>
+							<script src="<%= url('/leaflet.shpfile.js') %>"></script>
+							<script>
+								var mymap = L.map('mapid').setView([39.768, -86.159], 11);
+								L.tileLayer('https://api.mapbox.com/styles/v1/mnakhaleh/cip615lmk0002asmdw3dxo932/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibW5ha2hhbGVoIiwiYSI6ImNpcDVpNGw4MTAwYzV2NWtyM3l5ZGl4bjkifQ.jmycD6LV9EP_m2-3bHgUNw', {
+									attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+									maxZoom: 18,
+									id: 'mapbox.testingleaflet'
+								}).addTo(mymap);
+
+						        <% require 'csv' %>
+						        <% counter_gun = 0 %>
+						        <% counter_2014_gun = 0 %>
+						        <% counter_2013_gun = 0 %>
+						        <% counter_2012_gun = 0 %>
+						        <% counter_2011_gun = 0 %>
+						        <% counter_2010_gun = 0 %>
+						        <% counter_knife = 0 %>
+						        <% counter_2014_knife = 0 %>
+						        <% counter_2013_knife = 0 %>
+						        <% counter_2012_knife = 0 %>
+						        <% counter_2011_knife = 0 %>
+						        <% counter_2010_knife = 0 %>
+						        <% counter_other = 0 %>
+						        <% counter_2014_other = 0 %>
+						        <% counter_2013_other = 0 %>
+						        <% counter_2012_other = 0 %>
+						        <% counter_2011_other = 0 %>
+						        <% counter_2010_other = 0 %>
+						        <% counter_hands = 0 %>
+						        <% counter_2014_hands = 0 %>
+						        <% counter_2013_hands = 0 %>
+						        <% counter_2012_hands = 0 %>
+						        <% counter_2011_hands = 0 %>
+						        <% counter_2010_hands = 0 %>
+
+						        var twentyfourteen = L.layerGroup();
+								<% CSV.foreach("IMPD_UCR_2014_Data_NEW.csv") do |row| %>
+									<% if row[1].to_s == "170" || row[1].to_s == "171" || row[1].to_s == "172" || row[1].to_s == "173"%>
+										<% if row[1].to_s == "170" %>
+											<% counter_gun += 1 %>
+											<% counter_2014_gun += 1 %>
+										<% elsif row[1].to_s == "171" %>
+											<% counter_knife += 1 %>
+											<% counter_2014_knife += 1 %>
+										<% elsif row[1].to_s == "172" %>
+											<% counter_other += 1 %>
+											<% counter_2014_other += 1 %>
+										<% elsif row[1].to_s == "173" %>
+											<% counter_hands += 1 %>
+											<% counter_2014_hands += 1 %>
+										<% end %>
+										var circle = L.circle([<%= row[9].to_f %>, <%= row[8].to_f %>], 10, {
+											color: 'green',
+											fillColor: '#0c0',
+											fillOpacity: 0.5
+										}).addTo(twentyfourteen);
+									<% end %>
+								<% end %>
+
+								var twentythirteen = L.layerGroup();
+								<% CSV.foreach("IMPD_UCR_2013_Data_NEW.csv") do |row| %>
+									<% if row[1].to_s == "170" || row[1].to_s == "171" || row[1].to_s == "172" || row[1].to_s == "173"%>
+										<% if row[1].to_s == "170" %>
+											<% counter_gun += 1 %>
+											<% counter_2013_gun += 1 %>
+										<% elsif row[1].to_s == "171" %>
+											<% counter_knife += 1 %>
+											<% counter_2013_knife += 1 %>
+										<% elsif row[1].to_s == "172" %>
+											<% counter_other += 1 %>
+											<% counter_2013_other += 1 %>
+										<% elsif row[1].to_s == "173" %>
+											<% counter_hands += 1 %>
+											<% counter_2013_hands += 1 %>
+										<% end %>
+										var circle = L.circle([<%= row[9].to_f %>, <%= row[8].to_f %>], 10, {
+											color: 'yellow',
+											fillColor: '#ff0',
+											fillOpacity: 0.5
+										}).addTo(twentythirteen);
+									<% end %>
+								<% end %>
+
+								var twentytwelve = L.layerGroup();
+								<% CSV.foreach("IMPD_UCR_2012_Data_NEW.csv") do |row| %>
+									<% if row[1].to_s == "170" || row[1].to_s == "171" || row[1].to_s == "172" || row[1].to_s == "173"%>
+										<% if row[1].to_s == "170" %>
+											<% counter_gun += 1 %>
+											<% counter_2012_gun += 1 %>
+										<% elsif row[1].to_s == "171" %>
+											<% counter_knife += 1 %>
+											<% counter_2012_knife += 1 %>
+										<% elsif row[1].to_s == "172" %>
+											<% counter_other += 1 %>
+											<% counter_2012_other += 1 %>
+										<% elsif row[1].to_s == "173" %>
+											<% counter_hands += 1 %>
+											<% counter_2012_hands += 1 %>
+										<% end %>
+										var circle = L.circle([<%= row[9].to_f %>, <%= row[8].to_f %>], 10, {
+											color: 'orange',
+											fillColor: '#f60',
+											fillOpacity: 0.5
+										}).addTo(twentytwelve);
+									<% end %>
+								<% end %>
+
+								var twentyeleven = L.layerGroup();
+								<% CSV.foreach("IMPD_UCR_2011_Data_NEW.csv") do |row| %>
+									<% if row[1].to_s == "170" || row[1].to_s == "171" || row[1].to_s == "172" || row[1].to_s == "173"%>
+										<% if row[1].to_s == "170" %>
+											<% counter_gun += 1 %>
+											<% counter_2011_gun += 1 %>
+										<% elsif row[1].to_s == "171" %>
+											<% counter_knife += 1 %>
+											<% counter_2011_knife += 1 %>
+										<% elsif row[1].to_s == "172" %>
+											<% counter_other += 1 %>
+											<% counter_2011_other += 1 %>
+										<% elsif row[1].to_s == "173" %>
+											<% counter_hands += 1 %>
+											<% counter_2011_hands += 1 %>
+										<% end %>
+										var circle = L.circle([<%= row[9].to_f %>, <%= row[8].to_f %>], 10, {
+											color: 'red',
+											fillColor: '#c00',
+											fillOpacity: 0.5
+										}).addTo(twentyeleven);
+									<% end %>
+								<% end %>
+
+								var twentyten = L.layerGroup();
+								<% CSV.foreach("IMPD_UCR_2010_Data_NEW.csv") do |row| %>
+									<% if row[1].to_s == "170" || row[1].to_s == "171" || row[1].to_s == "172" || row[1].to_s == "173"%>
+										<% if row[1].to_s == "170" %>
+											<% counter_gun += 1 %>
+											<% counter_2010_gun += 1 %>
+										<% elsif row[1].to_s == "171" %>
+											<% counter_knife += 1 %>
+											<% counter_2010_knife += 1 %>
+										<% elsif row[1].to_s == "172" %>
+											<% counter_other += 1 %>
+											<% counter_2010_other += 1 %>
+										<% elsif row[1].to_s == "173" %>
+											<% counter_hands += 1 %>
+											<% counter_2010_hands += 1 %>
+										<% end %>
+										var circle = L.circle([<%= row[9].to_f %>, <%= row[8].to_f %>], 10, {
+											color: 'purple',
+											fillColor: '#606',
+											fillOpacity: 0.5
+										}).addTo(twentyten);
+									<% end %>
+								<% end %>
+
+								var beats = L.geoJson(police, {
+									style: function (feature) {
+										fillColors = ['red', 'green', 'blue'];
+										styles = {
+											weight: 1,
+											color: "#999",
+											opacity: 1,
+											fillColor: "#999999",
+											fillOpacity: 0.5
+										}
+									},
+									onEachFeature: function(feature, layer) {
+										if (feature.properties) {
+											layer.bindPopup(Object.keys(feature.properties).map(function(k) {
+												return k + ": " + feature.properties[k];
+											}).join("<br />"), {
+												maxHeight: 200
+											});
+										}
+									}
+								});
+
+								var neighborhoods = L.geoJson(neighborhoods, {
+									style: function (feature) {
+										fillColors = ['red', 'green', 'blue'];
+										styles = {
+											weight: 1,
+											color: "#999",
+											opacity: 1,
+											fillColor: 'blue',
+											fillOpacity: 0.5
+										}
+									},
+									onEachFeature: function(feature, layer) {
+										if (feature.properties) {
+											layer.bindPopup(Object.keys(feature.properties).map(function(k) {
+												return k + ": " + feature.properties[k];
+											}).join("<br />"), {
+												maxHeight: 200
+											});
+										}
+									}
+								});
+
+								var homes = L.geoJson(houses, {
+									style: function (feature) {
+										fillColors = ['red', 'green', 'blue'];
+										styles = {
+											weight: 1,
+											color: "#999",
+											opacity: 1,
+											fillColor: 'blue',
+											fillOpacity: 0.5
+										}
+									}
+								});
+
+
+								$("#delAbandoned").on("click", function() { mymap.removeLayer(homes); });
+								$("#addAbandoned").on("click", function() { homes.addTo(mymap); });
+								$("#delNeighborhood").on("click", function() { mymap.removeLayer(neighborhoods); });
+								$("#addNeighborhood").on("click", function() { neighborhoods.addTo(mymap); });
+								$("#delBeat").on("click", function() { mymap.removeLayer(beats); });
+								$("#addBeat").on("click", function() { beats.addTo(mymap); });
+
+								$("#del2014").on("click", function() { mymap.removeLayer(twentyfourteen); });
+								$("#add2014").on("click", function() { twentyfourteen.addTo(mymap); });
+								$("#del2013").on("click", function() { mymap.removeLayer(twentythirteen); });
+								$("#add2013").on("click", function() { twentythirteen.addTo(mymap); });
+								$("#del2012").on("click", function() { mymap.removeLayer(twentytwelve); });
+								$("#add2012").on("click", function() { twentytwelve.addTo(mymap); });
+								$("#del2011").on("click", function() { mymap.removeLayer(twentyeleven); });
+								$("#add2011").on("click", function() { twentyeleven.addTo(mymap); });
+								$("#del2010").on("click", function() { mymap.removeLayer(twentyten); });
+								$("#add2010").on("click", function() { twentyten.addTo(mymap); });
+							</script>
+						</header>
+						<br>
+						<h2>Conclusions</h2>
+						<p>Between 2010 and 2014, there were <%= counter_gun %> gun aggravated assaults, <%= counter_knife %> knife aggavated assaults, <%= counter_other %> other weapon aggravated assaults, and <%= counter_hands %> aggravated assaults using hands in Indianapolis.</p>
+						<p>In 2010, there were <%= counter_2010_gun %> gun aggravated assaults, <%= counter_2010_knife %> knife aggavated assaults, <%= counter_2010_other %> other weapon aggravated assaults, and <%= counter_2010_hands %> aggravated assaults using hands.<br>
+						In 2011, there were <%= counter_2011_gun %> gun aggravated assaults, <%= counter_2011_knife %> knife aggavated assaults, <%= counter_2011_other %> other weapon aggravated assaults, and <%= counter_2011_hands %> aggravated assaults using hands.<br>
+						In 2012, there were <%= counter_2012_gun %> gun aggravated assaults, <%= counter_2012_knife %> knife aggavated assaults, <%= counter_2012_other %> other weapon aggravated assaults, and <%= counter_2012_hands %> aggravated assaults using hands.<br>
+						In 2013, there were <%= counter_2013_gun %> gun aggravated assaults, <%= counter_2013_knife %> knife aggavated assaults, <%= counter_2013_other %> other weapon aggravated assaults, and <%= counter_2013_hands %> aggravated assaults using hands.<br>
+						In 2014, there were <%= counter_2014_gun %> gun aggravated assaults, <%= counter_2014_knife %> knife aggavated assaults, <%= counter_2014_other %> other weapon aggravated assaults, and <%= counter_2014_hands %> aggravated assaults using hands.</p>
+						<p>For some reason, the number of gun and fist assaults have skyrocketed in the past few years.</p>
+					</div>
+				</div>
+
+			<!-- Footer -->
+				<footer id="footer">
+					<div class="inner">
+						<ul class="copyright">
+							<li>&copy; 2016.  All rights reserved.  Made with &hearts; by Team Buckeye.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</footer>
+			</div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/skel.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="/assets/js/main.js"></script>
+
+	</body>
+</body>
